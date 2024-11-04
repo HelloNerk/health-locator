@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/static/styles.css">
+    <title>Health Locator</title>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <h3>Health Locator</h3>
+        </div>
+        <ul class="nav-links">
+            <li class="nav-item"><a class="link" href="/">Home</a></li>
+            <li class="nav-item"><a class="link" href="/">Search</a></li>
+        </ul>
+    </nav>
+    <section class="search">
+        <div class="search-information">
+            <h2 class="search-title">Search Hospital</h2>
+            <p class="search-description">Search for hospitals near you</p>
+            <div class="search-inputs">
+                <label for="latitude" class="search-label">Latitud:</label>
+                <input type="number" class="search-input" id="latitude" placeholder="Enter latitud" step="any">
+                <label for="longitude" class="search-label">Longitud:</label>
+                <input type="number" class="search-input" id="longitude" placeholder="Enter longitud" step="any">
+                <button class="submit" onclick="searchHospitals()">
+                    Search
+                </button>
+            </div>
+        </div>
+    </section>
+    <section class="map" id="map-container">
+        <!-- El mapa se insertará aquí -->
+    </section>
+
+    <script>
+        function searchHospitals() {
+            const latitude = document.getElementById('latitude').value;
+            const longitude = document.getElementById('longitude').value;
+
+            if (!latitude || !longitude) {
+                alert('Por favor ingrese latitud y longitud');
+                return;
+            }
+
+            fetch('/get_map', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    latitude: parseFloat(latitude),
+                    longitude: parseFloat(longitude)
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    document.getElementById('map-container').innerHTML = data.map_html;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al obtener el mapa');
+            });
+        }
+    </script>
+</body>
+</html>
