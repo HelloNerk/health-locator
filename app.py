@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import folium as fl
+from folium.plugins import MarkerCluster
 from geopy.distance import great_circle
 from collections import defaultdict
 import heapq
@@ -12,11 +13,11 @@ def crear_app():
     app.config['TEMPLATES_AUTO_RELOAD'] = True
 
     def generate_map(user_lat, user_lon):
-        
         excel_path = os.path.join(os.path.dirname(__file__), 'assets', 'dataset_actualizado.xlsx')
         df_hospitals = pd.read_excel(excel_path, sheet_name='Hospitales')
         df_connections = pd.read_excel(excel_path, sheet_name='Conexiones')
 
+        # Crear el mapa con una ubicación inicial centrada
         map = fl.Map(location=[df_hospitals['norte_sig'].mean(), df_hospitals['este_sig'].mean()], zoom_start=7)
 
         def dijkstra(adj_list, start_hospital):
@@ -90,40 +91,48 @@ def crear_app():
         graph = create_graph(df_connections, df_hospitals)
         mst = kruskal_mst(graph, df_hospitals)
 
+        # Añadir los hospitales al mapa usando MarkerCluster
+        marker_cluster = MarkerCluster().add_to(map)
         for _, hospital in df_hospitals.iterrows():
             fl.Marker(
                 [hospital['norte_sig'], hospital['este_sig']],
                 popup=f"Hospital {hospital['index']}: {hospital['est_nombre']}",
                 icon=fl.Icon(color='red', icon='hospital', prefix='fa')
-            ).add_to(map)
+            ).add_to(marker_cluster)
 
         for hospital1, hospital2, _ in mst:
             coord1 = df_hospitals[df_hospitals['index'] == hospital1][['norte_sig', 'este_sig']].values[0]
             coord2 = df_hospitals[df_hospitals['index'] == hospital2][['norte_sig', 'este_sig']].values[0]
             fl.PolyLine([coord1, coord2], color="green", weight=2, opacity=0.8).add_to(map)
 
-        # Usar los parámetros en lugar de input()
-        nearest_hospital, distance = find_nearest_hospital(user_lat, user_lon, df_hospitals)
-
+        # Marcador del usuario
         fl.Marker([user_lat, user_lon], popup='Usuario', icon=fl.Icon(color='blue', icon='user', prefix='fa')).add_to(map)
+
+        nearest_hospital, distance = find_nearest_hospital(user_lat, user_lon, df_hospitals)
         nearest_coord = df_hospitals[df_hospitals['index'] == nearest_hospital][['norte_sig', 'este_sig']].values[0]
         fl.PolyLine([[user_lat, user_lon], nearest_coord], color="red", weight=2, opacity=0.8).add_to(map)
 
         shortest_paths = dijkstra(graph, nearest_hospital)
-
         sorted_paths = sorted(shortest_paths.items(), key=lambda x: x[1])[:5]
         for hospital, distance in sorted_paths[1:]:
             coord = df_hospitals[df_hospitals['index'] == hospital][['norte_sig', 'este_sig']].values[0]
             fl.PolyLine([nearest_coord, coord], color="blue", weight=2, opacity=0.5).add_to(map)
 
-        # En lugar de guardar el mapa, devolver el HTML
         return map._repr_html_()
 
 
 
     @app.route('/')
     def home():
+        return render_template('home.html')
+
+    @app.route('/search')
+    def search():
         return render_template('index.html')
+
+    @app.route('/home')
+    def home_redirect():
+        return render_template('home.html')
 
     @app.route('/get_map', methods=['POST'])
     def get_map():

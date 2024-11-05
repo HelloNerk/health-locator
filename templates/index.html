@@ -9,14 +9,15 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
     <title>Health Locator</title>
 </head>
-<body>
+<body class="body">
     <nav class="navbar">
         <div class="logo">
-            <h3>Health Locator</h3>
+            <img src="{{ url_for('static', filename='/images/logo.png') }}" alt="">
+            <h2>Health Locator</h2>
         </div>
         <ul class="nav-links">
-            <li class="nav-item"><a class="link" href="/">Home</a></li>
-            <li class="nav-item"><a class="link" href="/">Search</a></li>
+            <li class="nav-item"><a class="link" href="/home">Home</a></li>
+            <li class="nav-item"><a class="link" href="/search">Search</a></li>
         </ul>
     </nav>
     <section class="search">
@@ -24,29 +25,47 @@
             <h2 class="search-title">Search Hospital</h2>
             <p class="search-description">Search for hospitals near you</p>
             <div class="search-inputs">
-                <label for="latitude" class="search-label">Latitud:</label>
-                <input type="number" class="search-input" id="latitude" placeholder="Enter latitud" step="any">
-                <label for="longitude" class="search-label">Longitud:</label>
-                <input type="number" class="search-input" id="longitude" placeholder="Enter longitud" step="any">
+                <div>
+                    <label for="latitude" class="search-label">Latitud:</label>
+                    <input type="number" class="search-input" id="latitude" placeholder="Enter latitud" step="any">
+                </div>
+                <div>
+                    <label for="longitude" class="search-label">Longitud:</label>
+                    <input type="number" class="search-input" id="longitude" placeholder="Enter longitud" step="any">
+                </div>
                 <button class="submit" onclick="searchHospitals()">
                     Search
                 </button>
             </div>
         </div>
     </section>
-    <section class="map" id="map-container">
-        <!-- El mapa se insertará aquí -->
+    <section class="map_search" id="map-default">
+        <iframe class="map_frame" src="{{ url_for('static',filename='mapa_hospitales_con_clusters.html') }}" frameborder="0"></iframe>
     </section>
+    <section class="loading-spinner undisplayed" id="loading-spinner">
+        <div class="spinner"></div>
+        <p class="text-spinner">Cargando mapa...</p>
+    </section>
+    <section class="map_search" id="map-container">
+    </section>
+    <footer class="footer">
+        <p class="footer-text">&copy; 2024 Health Locator. All rights reserved. </p>
+    </footer>
 
     <script>
         function searchHospitals() {
             const latitude = document.getElementById('latitude').value;
             const longitude = document.getElementById('longitude').value;
+            const loadingSpinner = document.getElementById('loading-spinner');
+            const map = document.getElementById('map-default');            
 
             if (!latitude || !longitude) {
                 alert('Por favor ingrese latitud y longitud');
                 return;
             }
+
+            map.classList.add('undisplayed');
+            loadingSpinner.classList.remove('undisplayed'); // Muestra el indicador de carga solo cuando se hace clic en el botón
 
             fetch('/get_map', {
                 method: 'POST',
@@ -60,6 +79,7 @@
             })
             .then(response => response.json())
             .then(data => {
+                loadingSpinner.classList.add('undisplayed'); // Oculta el indicador de carga después de recibir la respuesta
                 if (data.error) {
                     alert('Error: ' + data.error);
                 } else {
@@ -67,6 +87,7 @@
                 }
             })
             .catch(error => {
+                loadingSpinner.classList.add('undisplayed'); // Oculta el indicador de carga si hay un error
                 console.error('Error:', error);
                 alert('Error al obtener el mapa');
             });

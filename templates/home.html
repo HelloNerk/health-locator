@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Health Locator</title>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='/images/logo.png') }}" alt="">
+            <h2>Health Locator</h2>
+        </div>
+        <ul class="nav-links">
+            <li class="nav-item"><a class="link" href="/home">Home</a></li>
+            <li class="nav-item"><a class="link" href="/search">Search</a></li>
+        </ul>
+    </nav>
+    <section class="hero">
+        <div class="hero-information">
+            <h1 class="hero-title">Facilitando el Acceso a Servicios de Salud<span class="hero-title hero-title--white"> en la Selva del Perú</span></h1>
+            <p class="hero-description">Health Locator es una aplicación web que te permite encontrar hospitales cercanos a tu ubicación en la selva del Perú. ¡No importa donde estés, siempre tendrás acceso a servicios de salud!</p>
+            <a href="/search" class="hero-button">Buscar Hospitales -></a>
+        </div>
+        <div class="hero-image-container">
+            <img src="{{url_for('static',filename='/images/hero-image.webp')}}" alt="Hero image" class="hero-image">
+        </div>
+    </section>
+    <section class="about">
+        <div class="about-information">
+            <h2 class="about-title">¿Qué es Health Locator?</h2>
+            <p class="about-description">Health Locator es una aplicación web que te permite encontrar hospitales cercanos a tu ubicación en la selva del Perú. Health Locator utiliza algoritmos de búsqueda avanzados para encontrar hospitales cercanos a tu ubicación en la selva del Perú. ¡No importa donde estés, siempre tendrás acceso a servicios de salud!</p>
+        </div>
+        <div class="info-cards">
+            <div class="card">
+                <img src="{{url_for('static',filename='/images/card1.jpg')}}" alt="Card 1" class="card-image">
+                <h3 class="card-title">1. Ingresa tu ubicación</h3>
+            </div>
+            <div class="card">
+                <img src="{{url_for('static',filename='/images/card2.png')}}" alt="Card 1" class="card-image">
+                <h3 class="card-title">2. Dale click a Search</h3>
+            </div>
+            <div class="card">
+                <img src="{{url_for('static',filename='/images/card3.png')}}" alt="Card 1" class="card-image">
+                <h3 class="card-title">3. Encuentra tu Hospital más cercano</h3>
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+        <p class="footer-text">&copy; 2024 Health Locator. All rights reserved. </p>
+    </footer>
+</body>
+</html>
